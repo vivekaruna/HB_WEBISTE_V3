@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="80" viewBox="0 0 240 80" role="img" aria-labelledby="logoTitle">
+  <title id="logoTitle">Hillboy Engineering Logo</title>
+  <rect width="240" height="80" rx="18" fill="#0f1d34" />
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#4fa3ff" font-family="Inter, sans-serif" font-size="20" font-weight="700">Hillboy</text>
+  <text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" fill="#c3cbd8" font-family="Inter, sans-serif" font-size="12">Engineering</text>
+</svg>

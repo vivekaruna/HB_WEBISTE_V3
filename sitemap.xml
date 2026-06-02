@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Update the <loc> URLs to the site base URL after deployment -->
+  <url>
+    <loc>https://your-domain.com/index.html</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/about.html</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/services.html</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/capabilities.html</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/industries.html</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/gallery.html</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/rfq.html</loc>
+  </url>
+  <url>
+    <loc>https://your-domain.com/contact.html</loc>
+  </url>
+</urlset>

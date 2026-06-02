@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="380" viewBox="0 0 600 380" role="img" aria-labelledby="heroTitle">
+  <title id="heroTitle">Manufacturing hero illustration</title>
+  <rect width="600" height="380" fill="#15263f" />
+  <circle cx="180" cy="190" r="80" fill="#4fa3ff" opacity="0.25" />
+  <rect x="320" y="110" width="220" height="140" rx="28" fill="#4fa3ff" opacity="0.16" />
+  <rect x="340" y="130" width="180" height="100" rx="18" fill="#0f1d34" stroke="#4fa3ff" stroke-width="4" />
+  <path d="M165 240 L225 240 L225 260 L165 260 Z" fill="#4fa3ff" />
+  <text x="300" y="280" fill="#c3cbd8" font-family="Inter, sans-serif" font-size="24" font-weight="600">Precision</text>
+</svg>
