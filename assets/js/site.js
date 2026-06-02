@@ -1,174 +1,135 @@
-// Mobile navigation toggle
-const navToggle = document.querySelector('.nav-toggle');
-const navMenu = document.querySelector('.nav');
+// Hillboy Engineering - Site Logic
 
-if (navToggle && navMenu) {
-  navToggle.addEventListener('click', () => {
-    navMenu.classList.toggle('open');
-    navToggle.setAttribute('aria-expanded', navMenu.classList.contains('open'));
-  });
-}
+document.addEventListener('DOMContentLoaded', () => {
+  // Mobile navigation toggle
+  const navToggle = document.querySelector('.nav-toggle');
+  const navMenu = document.querySelector('.nav');
 
-// Close menu when a link is clicked
-if (navMenu) {
-  navMenu.querySelectorAll('.nav__link').forEach((link) => {
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', navMenu.classList.contains('open'));
+    });
+  }
+
+  // Close menu when a link is clicked (mobile)
+  const navLinks = document.querySelectorAll('.nav__link');
+  navLinks.forEach(link => {
     link.addEventListener('click', () => {
-      if (navMenu.classList.contains('open')) {
+      if (window.innerWidth <= 768) {
         navMenu.classList.remove('open');
         navToggle.setAttribute('aria-expanded', 'false');
       }
     });
   });
-}
 
-// Lightbox functionality
-const lightbox = document.querySelector('.lightbox');
-const lightboxImage = document.querySelector('.lightbox__image');
-const lightboxCaption = document.querySelector('.lightbox__caption');
-const lightboxClose = document.querySelector('.lightbox__close');
+  // Carousel Logic
+  const carousel = document.querySelector('.carousel');
+  const slides = document.querySelectorAll('.carousel__slide');
+  const prevBtn = document.querySelector('.carousel__nav--prev');
+  const nextBtn = document.querySelector('.carousel__nav--next');
 
-function openLightbox(src, label) {
-  if (!lightbox || !lightboxImage || !lightboxCaption) return;
-  lightboxImage.src = src;
-  lightboxImage.alt = label;
-  lightboxCaption.textContent = label;
-  lightbox.classList.add('active');
-}
+  if (carousel && slides.length > 0) {
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    let autoSlideInterval;
 
-function closeLightbox() {
-  if (!lightbox) return;
-  lightbox.classList.remove('active');
-  lightboxImage.src = '';
-}
+    const updateCarousel = () => {
+      carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
+    };
 
-document.querySelectorAll('[data-lightbox]').forEach((item) => {
-  item.addEventListener('click', (event) => {
-    event.preventDefault();
-    openLightbox(item.href, item.dataset.caption || 'Gallery image');
-  });
-});
+    const nextSlide = () => {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateCarousel();
+    };
 
-if (lightboxClose) {
-  lightboxClose.addEventListener('click', closeLightbox);
-}
+    const prevSlide = () => {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateCarousel();
+    };
 
-if (lightbox) {
-  lightbox.addEventListener('click', (event) => {
-    if (event.target === lightbox) closeLightbox();
-  });
-}
+    const startAutoSlide = () => {
+      clearInterval(autoSlideInterval);
+      autoSlideInterval = setInterval(nextSlide, 4000); // 4 seconds
+    };
 
-// Form handling with Formspree
-const forms = document.querySelectorAll('form[data-remote]');
-forms.forEach((form) => {
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const status = form.querySelector('.form-status');
-    const data = new FormData(form);
-    if (!status) return;
-    status.textContent = 'Sending request...';
-    status.classList.add('active');
-    try {
-      const response = await fetch(form.action, {
-        method: form.method,
-        body: data,
-        headers: {
-          Accept: 'application/json',
-        },
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        nextSlide();
+        startAutoSlide();
       });
-      if (response.ok) {
-        status.textContent = 'Your inquiry has been sent successfully. We will contact you soon.';
-        form.reset();
-      } else {
-        status.textContent = 'Submission completed in the browser. Please update the form action URL to a valid Formspree endpoint.';
-      }
-    } catch (error) {
-      status.textContent = 'Unable to submit form from this page. Replace the placeholder endpoint or use a valid form integration URL.';
     }
-  });
-});
 
-// Carousel functionality
-const carousel = document.querySelector('.carousel');
-const carouselPrevBtn = document.querySelector('.carousel__nav--prev');
-const carouselNextBtn = document.querySelector('.carousel__nav--next');
-
-if (carousel) {
-  const slides = carousel.querySelectorAll('.carousel__slide');
-  let currentSlideIndex = 0;
-  let autoSlideInterval;
-
-  function showSlide(index) {
-    slides.forEach((slide) => {
-      slide.classList.remove('active');
-    });
-    if (index >= slides.length) {
-      currentSlideIndex = 0;
-    } else if (index < 0) {
-      currentSlideIndex = slides.length - 1;
-    } else {
-      currentSlideIndex = index;
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        prevSlide();
+        startAutoSlide();
+      });
     }
-    slides[currentSlideIndex].classList.add('active');
-  }
 
-  function nextSlide() {
-    showSlide(currentSlideIndex + 1);
-  }
-
-  function prevSlide() {
-    showSlide(currentSlideIndex - 1);
-  }
-
-  function startAutoSlide() {
-    autoSlideInterval = setInterval(nextSlide, 5000);
-  }
-
-  function resetAutoSlide() {
-    clearInterval(autoSlideInterval);
+    // Initialize auto-slide
     startAutoSlide();
+
+    // Pause on hover
+    carousel.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+    carousel.addEventListener('mouseleave', startAutoSlide);
   }
 
-  if (carouselPrevBtn) {
-    carouselPrevBtn.addEventListener('click', () => {
-      prevSlide();
-      resetAutoSlide();
-    });
-  }
+  // Form Handling
+  const form = document.querySelector('form[data-remote]');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = form.querySelector('.form-status');
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const formData = new FormData(form);
 
-  if (carouselNextBtn) {
-    carouselNextBtn.addEventListener('click', () => {
-      nextSlide();
-      resetAutoSlide();
-    });
-  }
-
-  // Show first slide and start auto-slide
-  if (slides.length > 0) {
-    showSlide(0);
-    startAutoSlide();
-  }
-}
-
-// Update active nav link based on scroll position
-window.addEventListener('scroll', () => {
-  const sections = document.querySelectorAll('section[id]');
-  sections.forEach((section) => {
-    const rect = section.getBoundingClientRect();
-    const link = document.querySelector(`.nav__link[href="#${section.id}"]`);
-    if (link) {
-      if (rect.top >= -100 && rect.top < window.innerHeight / 2) {
-        document.querySelectorAll('.nav__link').forEach((l) => l.classList.remove('active'));
-        link.classList.add('active');
+      if (status) {
+        status.textContent = 'Processing...';
+        status.style.display = 'block';
+        status.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
       }
-    }
-  });
-});
 
-// Set initial active link
-document.querySelectorAll('.nav__link').forEach((link) => {
-  if (link.getAttribute('href') === '#home') {
-    link.classList.add('active');
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          if (status) {
+            status.textContent = 'Thank you! Your inquiry has been sent.';
+            status.style.color = '#25d366';
+          }
+          form.reset();
+        } else {
+          throw new Error();
+        }
+      } catch (err) {
+        if (status) {
+          status.textContent = 'Oops! Something went wrong. Please try again.';
+          status.style.color = '#ff4d4d';
+        }
+      }
+    });
   }
-});
 
+  // Active Link on Scroll
+  const observerOptions = {
+    threshold: 0.5
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+        });
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('section[id]').forEach(section => observer.observe(section));
+});
