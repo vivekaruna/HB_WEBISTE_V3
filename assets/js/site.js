@@ -116,23 +116,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const action =
           form.getAttribute("action");
 
-        /*
-         * The project currently contains the placeholder:
-         *
-         * https://formspree.io/f/your-form-id
-         *
-         * Do not pretend the submission succeeded
-         * until a real endpoint has been configured.
-         */
-
-        if (
-          !action ||
-          action.includes("your-form-id")
-        ) {
+        if (!action) {
 
           showStatus(
             status,
-            "The form design is ready. A production RFQ endpoint still needs to be connected before submissions can be sent.",
+            "Unable to submit the requirement. Please try again.",
             "error"
           );
 
