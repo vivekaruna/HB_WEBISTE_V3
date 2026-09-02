@@ -1,135 +1,268 @@
-// Hillboy Engineering - Site Logic
+document.addEventListener("DOMContentLoaded", () => {
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Mobile navigation toggle
-  const navToggle = document.querySelector('.nav-toggle');
-  const navMenu = document.querySelector('.nav');
+  /* =======================================================
+     MOBILE NAVIGATION
+     ======================================================= */
 
-  if (navToggle && navMenu) {
-    navToggle.addEventListener('click', () => {
-      navMenu.classList.toggle('open');
-      navToggle.setAttribute('aria-expanded', navMenu.classList.contains('open'));
+  const navToggle = document.querySelector(".nav-toggle");
+  const nav = document.querySelector(".nav");
+
+  if (navToggle && nav) {
+
+    navToggle.addEventListener("click", () => {
+
+      const isOpen = nav.classList.toggle("open");
+
+      navToggle.setAttribute(
+        "aria-expanded",
+        String(isOpen)
+      );
+
+      document.body.classList.toggle(
+        "nav-open",
+        isOpen
+      );
+
     });
+
+
+    nav.querySelectorAll("a").forEach((link) => {
+
+      link.addEventListener("click", () => {
+
+        nav.classList.remove("open");
+
+        navToggle.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+
+        document.body.classList.remove(
+          "nav-open"
+        );
+
+      });
+
+    });
+
   }
 
-  // Close menu when a link is clicked (mobile)
-  const navLinks = document.querySelectorAll('.nav__link');
-  navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      if (window.innerWidth <= 768) {
-        navMenu.classList.remove('open');
-        navToggle.setAttribute('aria-expanded', 'false');
+
+  /* =======================================================
+     FILE INPUT DISPLAY
+     ======================================================= */
+
+  const drawingInput =
+    document.querySelector("#drawing");
+
+  const fileWrapper =
+    document.querySelector(".file-input-wrapper");
+
+  const fileCopy =
+    document.querySelector(".file-input-copy");
+
+  if (
+    drawingInput &&
+    fileWrapper &&
+    fileCopy
+  ) {
+
+    drawingInput.addEventListener(
+      "change",
+      () => {
+
+        const file =
+          drawingInput.files?.[0];
+
+        if (!file) {
+          return;
+        }
+
+        fileWrapper.classList.add(
+          "has-file"
+        );
+
+        fileCopy.innerHTML = `
+          <strong>${escapeHtml(file.name)}</strong>
+          <small>
+            File selected — choose another file to replace it
+          </small>
+        `;
+
       }
-    });
-  });
+    );
 
-  // Carousel Logic
-  const carousel = document.querySelector('.carousel');
-  const slides = document.querySelectorAll('.carousel__slide');
-  const prevBtn = document.querySelector('.carousel__nav--prev');
-  const nextBtn = document.querySelector('.carousel__nav--next');
-
-  if (carousel && slides.length > 0) {
-    let currentSlide = 0;
-    const totalSlides = slides.length;
-    let autoSlideInterval;
-
-    const updateCarousel = () => {
-      carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
-    };
-
-    const nextSlide = () => {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      updateCarousel();
-    };
-
-    const prevSlide = () => {
-      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      updateCarousel();
-    };
-
-    const startAutoSlide = () => {
-      clearInterval(autoSlideInterval);
-      autoSlideInterval = setInterval(nextSlide, 4000); // 4 seconds
-    };
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        nextSlide();
-        startAutoSlide();
-      });
-    }
-
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
-        prevSlide();
-        startAutoSlide();
-      });
-    }
-
-    // Initialize auto-slide
-    startAutoSlide();
-
-    // Pause on hover
-    carousel.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
-    carousel.addEventListener('mouseleave', startAutoSlide);
   }
 
-  // Form Handling
-  const form = document.querySelector('form[data-remote]');
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const status = form.querySelector('.form-status');
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const formData = new FormData(form);
 
-      if (status) {
-        status.textContent = 'Processing...';
-        status.style.display = 'block';
-        status.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-      }
+  /* =======================================================
+     RFQ FORM
+     ======================================================= */
 
-      try {
-        const response = await fetch(form.action, {
-          method: 'POST',
-          body: formData,
-          headers: { 'Accept': 'application/json' }
-        });
+  const form =
+    document.querySelector("#rfq-form");
 
-        if (response.ok) {
-          if (status) {
-            status.textContent = 'Thank you! Your inquiry has been sent.';
-            status.style.color = '#25d366';
+  const status =
+    document.querySelector(".form-status");
+
+  if (form && status) {
+
+    form.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+        const action =
+          form.getAttribute("action");
+
+        /*
+         * The project currently contains the placeholder:
+         *
+         * https://formspree.io/f/your-form-id
+         *
+         * Do not pretend the submission succeeded
+         * until a real endpoint has been configured.
+         */
+
+        if (
+          !action ||
+          action.includes("your-form-id")
+        ) {
+
+          showStatus(
+            status,
+            "The form design is ready. A production RFQ endpoint still needs to be connected before submissions can be sent.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        const submitButton =
+          form.querySelector(
+            'button[type="submit"]'
+          );
+
+        const originalText =
+          submitButton.innerHTML;
+
+        submitButton.disabled = true;
+
+        submitButton.innerHTML =
+          "Sending Requirement...";
+
+
+        try {
+
+          const formData =
+            new FormData(form);
+
+          const response =
+            await fetch(
+              action,
+              {
+                method: "POST",
+                body: formData,
+                headers: {
+                  Accept:
+                    "application/json"
+                }
+              }
+            );
+
+
+          if (!response.ok) {
+            throw new Error(
+              "Submission failed"
+            );
           }
+
+
           form.reset();
-        } else {
-          throw new Error();
+
+          fileWrapper?.classList.remove(
+            "has-file"
+          );
+
+          if (fileCopy) {
+
+            fileCopy.innerHTML = `
+              <strong>
+                Choose drawing or CAD file
+              </strong>
+
+              <small>
+                PDF, STEP, STP, IGES, IGS,
+                DWG, DXF or ZIP
+              </small>
+            `;
+
+          }
+
+
+          showStatus(
+            status,
+            "Thank you. Your requirement has been submitted successfully.",
+            "success"
+          );
+
+
+        } catch (error) {
+
+          console.error(error);
+
+          showStatus(
+            status,
+            "We could not submit your requirement. Please try again or email enquiry@hillboyengineering.com.",
+            "error"
+          );
+
+        } finally {
+
+          submitButton.disabled = false;
+
+          submitButton.innerHTML =
+            originalText;
+
         }
-      } catch (err) {
-        if (status) {
-          status.textContent = 'Oops! Something went wrong. Please try again.';
-          status.style.color = '#ff4d4d';
-        }
+
       }
-    });
+    );
+
   }
 
-  // Active Link on Scroll
-  const observerOptions = {
-    threshold: 0.5
-  };
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.getAttribute('id');
-        navLinks.forEach(link => {
-          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
-        });
-      }
-    });
-  }, observerOptions);
+  /* =======================================================
+     HELPERS
+     ======================================================= */
 
-  document.querySelectorAll('section[id]').forEach(section => observer.observe(section));
+  function showStatus(
+    element,
+    message,
+    type
+  ) {
+
+    element.textContent =
+      message;
+
+    element.className =
+      `form-status is-visible ${type}`;
+
+  }
+
+
+  function escapeHtml(value) {
+
+    const div =
+      document.createElement("div");
+
+    div.textContent =
+      value;
+
+    return div.innerHTML;
+
+  }
+
 });
