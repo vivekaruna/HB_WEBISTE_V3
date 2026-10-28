@@ -161,10 +161,32 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-          if (!response.ok) {
+          let result = null;
+
+          try {
+            result = await response.json();
+          } catch (jsonError) {
+            result = null;
+          }
+
+
+          console.log(
+            "Web3Forms response:",
+            result
+          );
+
+
+          if (
+            !response.ok ||
+            !result ||
+            !result.success
+          ) {
+
             throw new Error(
-              "Submission failed"
+              result?.message ||
+              `Submission failed (${response.status})`
             );
+
           }
 
 
@@ -199,11 +221,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-          console.error(error);
+          console.error(
+            "RFQ submission error:",
+            error
+          );
 
           showStatus(
             status,
-            "We could not submit your requirement. Please try again or email enquiry@hillboyengineering.com.",
+            error.message ||
+              "We could not submit your requirement. Please try again or email enquiry@hillboyengineering.com.",
             "error"
           );
 
